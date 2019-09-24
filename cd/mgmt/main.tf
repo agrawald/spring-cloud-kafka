@@ -6,25 +6,23 @@ provider "kubernetes" {
 module "zookeeper" {
   source = "../modules/services"
 
-  docker_image="bitnami/zookeeper"
+  docker_image="wurstmeister/zookeeper"
   app_name="zookeeper"
   port=2181
   target_port=2181
-  env_map = {
-    "ALLOW_ANONYMOUS_LOGIN"="yes"
-  }
 }
 
 module "kafka" {
   source="../modules/services"
 
-  docker_image="bitnami/kafka"
+  docker_image="wurstmeister/kafka"
   app_name="kafka"
   port=9092
   target_port=9092
   env_map= {
-    "ALLOW_PLAINTEXT_LISTENER"="yes",
-    "KAFKA_CFG_ZOOKEEPER_CONNECT"="zookeeper-svc:2181"
+    "KAFKA_CREATE_TOPICS"="test:1:1",
+    "KAFKA_ADVERTISED_HOST_NAME"="localhost",
+    "KAFKA_ZOOKEEPER_CONNECT"="zookeeper-svc:2181"
   }
 }
 
