@@ -26,17 +26,25 @@ module "kafka" {
   }
 }
 
-module "kafka-manager" {
+module "kafdrop" {
   source="../modules/services"
 
-  docker_image="sheepkiller/kafka-manager"
-  app_name="kafka-manager"
+  docker_image="thomsch98/kafdrop"
+  app_name="kafdrop"
   port=9000
   target_port=9000
   env_map= {
     "ZK_HOSTS"="zookeeper-svc:2181"
-    "APPLICATION_SECRET"="letmein"
   }
+}
+
+module "admin-server" {
+  source="../modules/services"
+
+  docker_image="dagrawal/spring-boot-admin-server"
+  app_name="admin-server"
+  port=9090
+  target_port=9090
 }
 
 

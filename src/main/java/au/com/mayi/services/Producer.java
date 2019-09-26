@@ -18,26 +18,30 @@ import lombok.extern.slf4j.Slf4j;
 public class Producer {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public DeferredResult<ResponseEntity<String>> produce(String message) {
+    public DeferredResult<ResponseEntity<String>> produce(final String message) {
         final DeferredResult<ResponseEntity<String>> deferredResult = new DeferredResult<>();
         kafkaTemplate.send("test", message);
         final ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send("test", message);
-
-        future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
-            @Override
-            public void onSuccess(SendResult<String, String> result) {
-                log.info("Sent message=[{}] with offset=[{}]", message, result.getRecordMetadata().offset());
-                deferredResult.setResult(ResponseEntity.ok().body(
-                        "Sent message=[" + message + "] with offset=[" + result.getRecordMetadata().offset() + "]"));
-            }
-
-            @Override
-            public void onFailure(Throwable ex) {
-                log.error("Unable to send message=[{}]", message, ex);
-                deferredResult.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Unable to send message=[" + message + "] due to " + ex.getMessage()));
-            }
-        });
+        future.addCallback(new ProducerCallback(message, deferredResult));
         return deferredResult;
+    }
+
+    @RequiredArgsConstructor
+    private class ProducerCallback implements ListenableFutureCallback<SendResult<String, String>> {
+        private final String message;
+        private final DeferredResult<ResponseEntity<String>> deferredResult;
+        @Override
+        public void onSuccess(SendResult<String, String> result) {
+            log.info("Sent message=[{}] with offset=[{}]", message, result.getRecordMetadata().offset());
+            deferredResult.setResult(ResponseEntity.ok()
+                    .body("Sent message=[" + message + "] with offset=[" + result.getRecordMetadata().offset() + "]"));
+        }
+
+        @Override
+        public void onFailure(Throwable ex) {
+            log.error("Unable to send message=[{}]", message, ex);
+            deferredResult.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Unable to send message=[" + message + "] due to " + ex.getMessage()));
+        }
     }
 }
