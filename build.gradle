@@ -27,6 +27,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'de.codecentric:spring-boot-admin-starter-client:2.1.6'
+
+	// https://mvnrepository.com/artifact/com.coveo/spring-boot-parameter-store-integration
+	implementation group: 'com.coveo', name: 'spring-boot-parameter-store-integration', version: '1.1.2'
+
 	compileOnly 'org.projectlombok:lombok'
 	
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'

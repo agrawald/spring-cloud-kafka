@@ -1,4 +1,4 @@
-version: '2'
+version: "2"
 networks:
   dev:
     driver: bridge
@@ -26,18 +26,21 @@ services:
       - "9092:9092"
     environment:
       KAFKA_CREATE_TOPICS: "test:1:1"
-      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.128.190
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      JMX_PORT: 10000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - dev
-  kafdrop:
-    container_name: kafdrop
-    image: thomsch98/kafdrop
+  kafka-manager:
+    container_name: kafka-manager
+    image: sheepkiller/kafka-manager
     environment: 
        ZK_HOSTS: zookeeper:2181
+       APPLICATION_SECRET: letmein
     ports:
       - 9000:9000
     networks:
       - dev
+   
